@@ -1,0 +1,5 @@
+/home/manuel/Escritorio/CVRP_Proyecto/build/Desktop_Qt_6_11_1-Debug/CMakeFiles/cvrp_app.dir
+/home/manuel/Escritorio/CVRP_Proyecto/build/Desktop_Qt_6_11_1-Debug/CMakeFiles/edit_cache.dir
+/home/manuel/Escritorio/CVRP_Proyecto/build/Desktop_Qt_6_11_1-Debug/CMakeFiles/rebuild_cache.dir
+/home/manuel/Escritorio/CVRP_Proyecto/build/Desktop_Qt_6_11_1-Debug/CMakeFiles/cvrp_app_autogen_timestamp_deps.dir
+/home/manuel/Escritorio/CVRP_Proyecto/build/Desktop_Qt_6_11_1-Debug/CMakeFiles/cvrp_app_autogen.dir

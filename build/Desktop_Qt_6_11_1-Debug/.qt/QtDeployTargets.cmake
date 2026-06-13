@@ -1,0 +1,2 @@
+set(__QT_DEPLOY_TARGET_cvrp_app_FILE /home/manuel/Escritorio/CVRP_Proyecto/build/Desktop_Qt_6_11_1-Debug/cvrp_app)
+set(__QT_DEPLOY_TARGET_cvrp_app_TYPE EXECUTABLE)
