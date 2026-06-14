@@ -107,11 +107,13 @@ public:
         comboAlgoritmo1 = new QComboBox(panelIzquierdo);
         comboAlgoritmo1->addItem(QString());
         comboAlgoritmo1->addItem(QString());
+        comboAlgoritmo1->addItem(QString());
         comboAlgoritmo1->setObjectName("comboAlgoritmo1");
 
         verticalLayout->addWidget(comboAlgoritmo1);
 
         comboAlgoritmo2 = new QComboBox(panelIzquierdo);
+        comboAlgoritmo2->addItem(QString());
         comboAlgoritmo2->addItem(QString());
         comboAlgoritmo2->addItem(QString());
         comboAlgoritmo2->setObjectName("comboAlgoritmo2");
@@ -223,9 +225,11 @@ public:
         label_3->setText(QCoreApplication::translate("MainWindow", "Capacidad", nullptr));
         comboAlgoritmo1->setItemText(0, QCoreApplication::translate("MainWindow", "Greedy", nullptr));
         comboAlgoritmo1->setItemText(1, QCoreApplication::translate("MainWindow", "Fuerza Bruta", nullptr));
+        comboAlgoritmo1->setItemText(2, QCoreApplication::translate("MainWindow", "Busqueda Local (Intra-vehiculo)", nullptr));
 
-        comboAlgoritmo2->setItemText(0, QCoreApplication::translate("MainWindow", "Fuerza Bruta", nullptr));
-        comboAlgoritmo2->setItemText(1, QCoreApplication::translate("MainWindow", "Greedy", nullptr));
+        comboAlgoritmo2->setItemText(0, QCoreApplication::translate("MainWindow", "Greedy", nullptr));
+        comboAlgoritmo2->setItemText(1, QCoreApplication::translate("MainWindow", "Fuerza Bruta", nullptr));
+        comboAlgoritmo2->setItemText(2, QCoreApplication::translate("MainWindow", "Busqueda Local (Intra - vehiculo)", nullptr));
 
         chkMostrarDemandas->setText(QCoreApplication::translate("MainWindow", "Mostrar Demandas", nullptr));
         btnEjecutar->setText(QCoreApplication::translate("MainWindow", "Ejecutar", nullptr));

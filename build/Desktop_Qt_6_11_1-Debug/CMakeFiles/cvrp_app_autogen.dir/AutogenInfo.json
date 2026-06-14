@@ -551,6 +551,12 @@
 			null
 		],
 		[
+			"/home/manuel/Escritorio/CVRP_Proyecto/include/local_search_intra.hpp",
+			"MU",
+			"6YEA5652QU/moc_local_search_intra.cpp",
+			null
+		],
+		[
 			"/home/manuel/Escritorio/CVRP_Proyecto/include/mainwindow.hpp",
 			"MU",
 			"6YEA5652QU/moc_mainwindow.cpp",
@@ -630,6 +636,11 @@
 			null
 		],
 		[ "/home/manuel/Escritorio/CVRP_Proyecto/src/greedy.cpp", "MU", null ],
+		[
+			"/home/manuel/Escritorio/CVRP_Proyecto/src/local_search_intra.cpp",
+			"MU",
+			null
+		],
 		[
 			"/home/manuel/Escritorio/CVRP_Proyecto/src/mainwindow.cpp",
 			"MU",

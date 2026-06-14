@@ -78,10 +78,20 @@
            <string>Fuerza Bruta</string>
           </property>
          </item>
+         <item>
+          <property name="text">
+           <string>Busqueda Local (Intra-vehiculo)</string>
+          </property>
+         </item>
         </widget>
        </item>
        <item>
         <widget class="QComboBox" name="comboAlgoritmo2">
+         <item>
+          <property name="text">
+           <string>Greedy</string>
+          </property>
+         </item>
          <item>
           <property name="text">
            <string>Fuerza Bruta</string>
@@ -89,7 +99,7 @@
          </item>
          <item>
           <property name="text">
-           <string>Greedy</string>
+           <string>Busqueda Local (Intra - vehiculo)</string>
           </property>
          </item>
         </widget>

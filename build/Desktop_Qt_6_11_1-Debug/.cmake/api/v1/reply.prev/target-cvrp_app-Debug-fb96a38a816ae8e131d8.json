@@ -390,28 +390,29 @@
 				6,
 				7,
 				8,
-				10
+				9,
+				11
 			]
 		},
 		{
 			"name" : "Forms",
 			"sourceIndexes" : 
 			[
-				9
+				10
 			]
 		},
 		{
 			"name" : "",
 			"sourceIndexes" : 
 			[
-				11
+				12
 			]
 		},
 		{
 			"name" : "CMake Rules",
 			"sourceIndexes" : 
 			[
-				12
+				13
 			]
 		}
 	],
@@ -456,6 +457,11 @@
 		{
 			"backtrace" : 1,
 			"path" : "include/greedy.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "include/local_search_intra.hpp",
 			"sourceGroupIndex" : 1
 		},
 		{

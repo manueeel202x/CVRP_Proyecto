@@ -8,11 +8,13 @@ cvrp_app_autogen/timestamp: \
 	/home/manuel/Escritorio/CVRP_Proyecto/build/Desktop_Qt_6_11_1-Debug/cvrp_app_autogen/moc_predefs.h \
 	/home/manuel/Escritorio/CVRP_Proyecto/include/brute_force.hpp \
 	/home/manuel/Escritorio/CVRP_Proyecto/include/greedy.hpp \
+	/home/manuel/Escritorio/CVRP_Proyecto/include/local_search_intra.hpp \
 	/home/manuel/Escritorio/CVRP_Proyecto/include/mainwindow.hpp \
 	/home/manuel/Escritorio/CVRP_Proyecto/include/vrp_base.hpp \
 	/home/manuel/Escritorio/CVRP_Proyecto/main/main.cpp \
 	/home/manuel/Escritorio/CVRP_Proyecto/src/brute_force.cpp \
 	/home/manuel/Escritorio/CVRP_Proyecto/src/greedy.cpp \
+	/home/manuel/Escritorio/CVRP_Proyecto/src/local_search_intra.cpp \
 	/home/manuel/Escritorio/CVRP_Proyecto/src/mainwindow.cpp \
 	/home/manuel/Qt/6.11.1/gcc_64/include/QtCore/q17memory.h \
 	/home/manuel/Qt/6.11.1/gcc_64/include/QtCore/q20bit.h \

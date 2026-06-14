@@ -13,6 +13,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/manuel/Escritorio/CVRP_Proyecto/main/main.cpp" "CMakeFiles/cvrp_app.dir/main/main.cpp.o" "gcc" "CMakeFiles/cvrp_app.dir/main/main.cpp.o.d"
   "/home/manuel/Escritorio/CVRP_Proyecto/src/brute_force.cpp" "CMakeFiles/cvrp_app.dir/src/brute_force.cpp.o" "gcc" "CMakeFiles/cvrp_app.dir/src/brute_force.cpp.o.d"
   "/home/manuel/Escritorio/CVRP_Proyecto/src/greedy.cpp" "CMakeFiles/cvrp_app.dir/src/greedy.cpp.o" "gcc" "CMakeFiles/cvrp_app.dir/src/greedy.cpp.o.d"
+  "/home/manuel/Escritorio/CVRP_Proyecto/src/local_search_intra.cpp" "CMakeFiles/cvrp_app.dir/src/local_search_intra.cpp.o" "gcc" "CMakeFiles/cvrp_app.dir/src/local_search_intra.cpp.o.d"
   "/home/manuel/Escritorio/CVRP_Proyecto/src/mainwindow.cpp" "CMakeFiles/cvrp_app.dir/src/mainwindow.cpp.o" "gcc" "CMakeFiles/cvrp_app.dir/src/mainwindow.cpp.o.d"
   )
 

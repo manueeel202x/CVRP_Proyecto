@@ -251,6 +251,30 @@ src/greedy.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cvrp_app.dir/build.make CMakeFiles/cvrp_app.dir/src/greedy.cpp.s
 .PHONY : src/greedy.cpp.s
 
+src/local_search_intra.o: src/local_search_intra.cpp.o
+.PHONY : src/local_search_intra.o
+
+# target to build an object file
+src/local_search_intra.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cvrp_app.dir/build.make CMakeFiles/cvrp_app.dir/src/local_search_intra.cpp.o
+.PHONY : src/local_search_intra.cpp.o
+
+src/local_search_intra.i: src/local_search_intra.cpp.i
+.PHONY : src/local_search_intra.i
+
+# target to preprocess a source file
+src/local_search_intra.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cvrp_app.dir/build.make CMakeFiles/cvrp_app.dir/src/local_search_intra.cpp.i
+.PHONY : src/local_search_intra.cpp.i
+
+src/local_search_intra.s: src/local_search_intra.cpp.s
+.PHONY : src/local_search_intra.s
+
+# target to generate assembly for a file
+src/local_search_intra.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cvrp_app.dir/build.make CMakeFiles/cvrp_app.dir/src/local_search_intra.cpp.s
+.PHONY : src/local_search_intra.cpp.s
+
 src/mainwindow.o: src/mainwindow.cpp.o
 .PHONY : src/mainwindow.o
 
@@ -298,6 +322,9 @@ help:
 	@echo "... src/greedy.o"
 	@echo "... src/greedy.i"
 	@echo "... src/greedy.s"
+	@echo "... src/local_search_intra.o"
+	@echo "... src/local_search_intra.i"
+	@echo "... src/local_search_intra.s"
 	@echo "... src/mainwindow.o"
 	@echo "... src/mainwindow.i"
 	@echo "... src/mainwindow.s"

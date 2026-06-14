@@ -10,6 +10,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/cvrp_app.dir/src/brute_force.cpp.o.d"
   "CMakeFiles/cvrp_app.dir/src/greedy.cpp.o"
   "CMakeFiles/cvrp_app.dir/src/greedy.cpp.o.d"
+  "CMakeFiles/cvrp_app.dir/src/local_search_intra.cpp.o"
+  "CMakeFiles/cvrp_app.dir/src/local_search_intra.cpp.o.d"
   "CMakeFiles/cvrp_app.dir/src/mainwindow.cpp.o"
   "CMakeFiles/cvrp_app.dir/src/mainwindow.cpp.o.d"
   "cvrp_app"

@@ -470,4 +470,5 @@ CMakeFiles/cvrp_app.dir/src/mainwindow.cpp.o: \
  /home/manuel/Qt/6.11.1/gcc_64/include/QtWidgets/QVBoxLayout \
  /home/manuel/Qt/6.11.1/gcc_64/include/QtWidgets/QWidget \
  /home/manuel/Escritorio/CVRP_Proyecto/include/greedy.hpp \
- /home/manuel/Escritorio/CVRP_Proyecto/include/brute_force.hpp
+ /home/manuel/Escritorio/CVRP_Proyecto/include/brute_force.hpp \
+ /home/manuel/Escritorio/CVRP_Proyecto/include/local_search_intra.hpp

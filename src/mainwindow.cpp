@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "greedy.hpp"
 #include "brute_force.hpp"
+#include "local_search_intra.hpp"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
@@ -12,9 +13,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->tablaResultados->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     // Configuración inicial de los selectores de algoritmos
-    QStringList algoritmos = {"Algoritmo Greedy (Vecino Cercano)", "Fuerza Bruta (Exacto)"};
-    ui->comboAlgoritmo1->addItems(algoritmos);
-    ui->comboAlgoritmo2->addItems(algoritmos);
+    //QStringList algoritmos = {"Algoritmo Greedy (Vecino Cercano)", "Fuerza Bruta (Exacto)"};
+    //ui->comboAlgoritmo1->addItems(algoritmos);
+    //ui->comboAlgoritmo2->addItems(algoritmos);
 }
 
 MainWindow::~MainWindow() {
@@ -39,8 +40,11 @@ void MainWindow::on_btnEjecutar_clicked() {
     if (ui->comboAlgoritmo1->currentIndex() == 0) {
         GreedySolution solver(*current_problem);
         solucion1 = solver.Solve();
-    } else {
+    } else if (ui->comboAlgoritmo1->currentIndex() == 1) {
         BruteForceSolution solver(*current_problem);
+        solucion1 = solver.Solve();
+    } else {
+        LocalSearchIntraSolution solver(*current_problem);
         solucion1 = solver.Solve();
     }
 
@@ -49,8 +53,11 @@ void MainWindow::on_btnEjecutar_clicked() {
     if (ui->comboAlgoritmo2->currentIndex() == 0) {
         GreedySolution solver(*current_problem);
         solucion2 = solver.Solve();
-    } else {
+    } else if (ui->comboAlgoritmo2->currentIndex() == 1) {
         BruteForceSolution solver(*current_problem);
+        solucion2 = solver.Solve();
+    } else {
+        LocalSearchIntraSolution solver(*current_problem);
         solucion2 = solver.Solve();
     }
 
