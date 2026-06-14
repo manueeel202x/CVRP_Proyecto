@@ -23,6 +23,8 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::on_btnEjecutar_clicked() {
+    int escala = 6;       // Antes multiplicábamos por 4, subir a 6 expande el grafo por el lienzo
+    int radioNodo = 16;    // Un radio de 16 significa círculos de 32x32 píxeles (¡mucho más grandes!)
     // 1. Capturar parámetros ingresados por el usuario en el panel izquierdo
     int clientes = ui->spinClientes->value();
     int vehiculos = ui->spinVehiculos->value();
@@ -51,6 +53,8 @@ void MainWindow::on_btnEjecutar_clicked() {
         BruteForceSolution solver(*current_problem);
         solucion2 = solver.Solve();
     }
+
+
     //limpiar
     if (ui->lienzoAlgoritmo1->scene()) {
         delete ui->lienzoAlgoritmo1->scene();
@@ -59,36 +63,55 @@ void MainWindow::on_btnEjecutar_clicked() {
     QGraphicsScene *scene1 = new QGraphicsScene(this);
     ui->lienzoAlgoritmo1->setScene(scene1);
 
-    // Dibujar Depósito Central (Un cuadrado rojo grande en el centro)
-    scene1->addRect(current_problem->depot_.x_ * 4 - 6, current_problem->depot_.y_ * 4 - 6, 12, 12,
-                    QPen(Qt::red), QBrush(Qt::red));
+    int depotX = current_problem->depot_.x_ * escala;
+    int depotY = current_problem->depot_.y_ * escala;
+    scene1->addRect(depotX - 8, depotY - 8, 16, 16, QPen(Qt::red), QBrush(Qt::red));
 
-    // Dibujar Clientes (Círculos azules)
-    for (const auto& node : current_problem->nodes_) {
-        scene1->addEllipse(node.x_ * 4 - 4, node.y_ * 4 - 4, 8, 8, QPen(Qt::blue), QBrush(Qt::blue));
-    }
-
-    // Dibujar Rutas de los Vehículos con colores distintos
+    // 2. Dibujar las Rutas primero (para que queden por debajo de los círculos)
     Qt::GlobalColor colores[] = {Qt::green, Qt::blue, Qt::cyan, Qt::magenta, Qt::yellow, Qt::darkYellow, Qt::darkCyan};
     for (const auto& v : solucion1.vehicles_) {
         if (v.nodes_.size() < 2) continue;
-
-        // Elegir color según el ID del camión
         QPen pen(colores[v.id_ % 7]);
-        pen.setWidth(2);
+        pen.setWidth(3); // Grosor equilibrado
 
         for (size_t i = 0; i < v.nodes_.size() - 1; ++i) {
             int from_id = v.nodes_[i];
             int to_id = v.nodes_[i+1];
 
-            // Obtener posiciones iniciales y finales
             Node from_node = (from_id == 0) ? current_problem->depot_ : current_problem->nodes_[from_id - 1];
             Node to_node = (to_id == 0) ? current_problem->depot_ : current_problem->nodes_[to_id - 1];
 
-            scene1->addLine(from_node.x_ * 4, from_node.y_ * 4, to_node.x_ * 4, to_node.y_ * 4, pen);
+            // Conectamos exactamente los centros geométricos
+            scene1->addLine(from_node.x_ * escala, from_node.y_ * escala,
+                            to_node.x_ * escala, to_node.y_ * escala, pen);
         }
     }
 
+    // 3. Dibujar los Nodos Clientes arriba de las líneas
+    for (const auto& node : current_problem->nodes_) {
+        int posX = node.x_ * escala;
+        int posY = node.y_ * escala;
+
+        // Círculo del cliente
+        scene1->addEllipse(posX - radioNodo, posY - radioNodo, radioNodo * 2, radioNodo * 2,
+                           QPen(Qt::white, 2), QBrush(Qt::blue));
+
+        // Texto de la demanda al frente de todo
+        if (ui->chkMostrarDemandas->isChecked()) {
+            QGraphicsTextItem *textoDemanda = scene1->addText(QString::number(node.demand_));
+            textoDemanda->setDefaultTextColor(Qt::white);
+
+            QFont font = textoDemanda->font();
+            font.setPointSize(11); // Letra grande y legible
+            font.setBold(true);
+            textoDemanda->setFont(font);
+
+            // Centrado matemático perfecto dentro del círculo azul
+            double textWidth = textoDemanda->boundingRect().width();
+            double textHeight = textoDemanda->boundingRect().height();
+            textoDemanda->setPos(posX - (textWidth / 2), posY - (textHeight / 2));
+        }
+    }
     // =================================================================
     // MOTOR DE DIBUJO USANDO QGraphicsScene (Lienzo Inferior - Algoritmo 2)
     // =================================================================
@@ -98,21 +121,14 @@ void MainWindow::on_btnEjecutar_clicked() {
     QGraphicsScene *scene2 = new QGraphicsScene(this);
     ui->lienzoAlgoritmo2->setScene(scene2);
 
-    // Dibujar Depósito Central
-    scene2->addRect(current_problem->depot_.x_ * 4 - 6, current_problem->depot_.y_ * 4 - 6, 12, 12,
-                    QPen(Qt::red), QBrush(Qt::red));
+    // 1. Centro real del depósito en Escena 2
+    scene2->addRect(depotX - 8, depotY - 8, 16, 16, QPen(Qt::red), QBrush(Qt::red));
 
-    // Dibujar Clientes
-    for (const auto& node : current_problem->nodes_) {
-        scene2->addEllipse(node.x_ * 4 - 4, node.y_ * 4 - 4, 8, 8, QPen(Qt::blue), QBrush(Qt::blue));
-    }
-
-    // Dibujar Rutas del segundo algoritmo
+    // 2. Dibujar las Rutas de la solución 2
     for (const auto& v : solucion2.vehicles_) {
         if (v.nodes_.size() < 2) continue;
-
         QPen pen(colores[v.id_ % 7]);
-        pen.setWidth(2);
+        pen.setWidth(3);
 
         for (size_t i = 0; i < v.nodes_.size() - 1; ++i) {
             int from_id = v.nodes_[i];
@@ -121,10 +137,33 @@ void MainWindow::on_btnEjecutar_clicked() {
             Node from_node = (from_id == 0) ? current_problem->depot_ : current_problem->nodes_[from_id - 1];
             Node to_node = (to_id == 0) ? current_problem->depot_ : current_problem->nodes_[to_id - 1];
 
-            scene2->addLine(from_node.x_ * 4, from_node.y_ * 4, to_node.x_ * 4, to_node.y_ * 4, pen);
+            scene2->addLine(from_node.x_ * escala, from_node.y_ * escala,
+                            to_node.x_ * escala, to_node.y_ * escala, pen);
         }
     }
 
+    // 3. Dibujar los Nodos Clientes en Escena 2
+    for (const auto& node : current_problem->nodes_) {
+        int posX = node.x_ * escala;
+        int posY = node.y_ * escala;
+
+        scene2->addEllipse(posX - radioNodo, posY - radioNodo, radioNodo * 2, radioNodo * 2,
+                           QPen(Qt::white, 2), QBrush(Qt::blue));
+
+        if (ui->chkMostrarDemandas->isChecked()) {
+            QGraphicsTextItem *textoDemanda = scene2->addText(QString::number(node.demand_));
+            textoDemanda->setDefaultTextColor(Qt::white);
+
+            QFont font = textoDemanda->font();
+            font.setPointSize(11);
+            font.setBold(true);
+            textoDemanda->setFont(font);
+
+            double textWidth = textoDemanda->boundingRect().width();
+            double textHeight = textoDemanda->boundingRect().height();
+            textoDemanda->setPos(posX - (textWidth / 2), posY - (textHeight / 2));
+        }
+    }
     ui->tablaResultados->setItem(0, 0, new QTableWidgetItem(QString::number(solucion1.total_cost_, 'f', 2)));
     // Celda (1, 0): Tiempo del Algoritmo 1
     ui->tablaResultados->setItem(1, 0, new QTableWidgetItem(QString::number(solucion1.execution_time_ms_, 'f', 3)));
@@ -133,4 +172,7 @@ void MainWindow::on_btnEjecutar_clicked() {
     ui->tablaResultados->setItem(0, 1, new QTableWidgetItem(QString::number(solucion2.total_cost_, 'f', 2)));
     // Celda (1, 1): Tiempo del Algoritmo 2
     ui->tablaResultados->setItem(1, 1, new QTableWidgetItem(QString::number(solucion2.execution_time_ms_, 'f', 3)));
+
+    //ui->lienzoAlgoritmo1->scale(1.2, 1.2); // Hace un zoom dinámico del 150%
+    //ui->lienzoAlgoritmo2->scale(1.2, 1.2);
 }

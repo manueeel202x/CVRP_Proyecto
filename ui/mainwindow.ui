@@ -95,6 +95,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="chkMostrarDemandas">
+         <property name="text">
+          <string>Mostrar Demandas</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="btnEjecutar">
          <property name="text">
           <string>Ejecutar</string>
@@ -181,11 +188,11 @@
           </size>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
-          <item>
+          <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
            <widget class="QTableWidget" name="tablaResultados">
             <property name="minimumSize">
              <size>
-              <width>0</width>
+              <width>550</width>
               <height>0</height>
              </size>
             </property>

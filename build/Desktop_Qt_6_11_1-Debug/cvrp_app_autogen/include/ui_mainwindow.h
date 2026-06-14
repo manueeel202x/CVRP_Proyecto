@@ -11,6 +11,7 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QHBoxLayout>
@@ -40,6 +41,7 @@ public:
     QSpinBox *spinCapacidad;
     QComboBox *comboAlgoritmo1;
     QComboBox *comboAlgoritmo2;
+    QCheckBox *chkMostrarDemandas;
     QPushButton *btnEjecutar;
     QWidget *contenedorDerecho;
     QVBoxLayout *verticalLayout_2;
@@ -116,6 +118,11 @@ public:
 
         verticalLayout->addWidget(comboAlgoritmo2);
 
+        chkMostrarDemandas = new QCheckBox(panelIzquierdo);
+        chkMostrarDemandas->setObjectName("chkMostrarDemandas");
+
+        verticalLayout->addWidget(chkMostrarDemandas);
+
         btnEjecutar = new QPushButton(panelIzquierdo);
         btnEjecutar->setObjectName("btnEjecutar");
 
@@ -188,10 +195,10 @@ public:
         QTableWidgetItem *__qtablewidgetitem3 = new QTableWidgetItem();
         tablaResultados->setVerticalHeaderItem(1, __qtablewidgetitem3);
         tablaResultados->setObjectName("tablaResultados");
-        tablaResultados->setMinimumSize(QSize(0, 0));
+        tablaResultados->setMinimumSize(QSize(550, 0));
         tablaResultados->setMaximumSize(QSize(16777215, 16777215));
 
-        horizontalLayout_3->addWidget(tablaResultados);
+        horizontalLayout_3->addWidget(tablaResultados, 0, Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter);
 
 
         verticalLayout_2->addWidget(panelInferior);
@@ -220,6 +227,7 @@ public:
         comboAlgoritmo2->setItemText(0, QCoreApplication::translate("MainWindow", "Fuerza Bruta", nullptr));
         comboAlgoritmo2->setItemText(1, QCoreApplication::translate("MainWindow", "Greedy", nullptr));
 
+        chkMostrarDemandas->setText(QCoreApplication::translate("MainWindow", "Mostrar Demandas", nullptr));
         btnEjecutar->setText(QCoreApplication::translate("MainWindow", "Ejecutar", nullptr));
         QTableWidgetItem *___qtablewidgetitem = tablaResultados->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QCoreApplication::translate("MainWindow", "Algoritmo1", nullptr));

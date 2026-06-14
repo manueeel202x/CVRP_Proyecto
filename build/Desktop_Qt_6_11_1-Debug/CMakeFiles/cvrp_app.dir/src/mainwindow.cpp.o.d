@@ -442,6 +442,8 @@ CMakeFiles/cvrp_app.dir/src/mainwindow.cpp.o: \
  /home/manuel/Qt/6.11.1/gcc_64/include/QtGui/qguiapplication.h \
  /home/manuel/Qt/6.11.1/gcc_64/include/QtGui/qinputmethod.h \
  /home/manuel/Qt/6.11.1/gcc_64/include/QtGui/qguiapplication_platform.h \
+ /home/manuel/Qt/6.11.1/gcc_64/include/QtWidgets/QCheckBox \
+ /home/manuel/Qt/6.11.1/gcc_64/include/QtWidgets/qcheckbox.h \
  /home/manuel/Qt/6.11.1/gcc_64/include/QtWidgets/QComboBox \
  /home/manuel/Qt/6.11.1/gcc_64/include/QtWidgets/QGraphicsView \
  /home/manuel/Qt/6.11.1/gcc_64/include/QtWidgets/qgraphicsview.h \
