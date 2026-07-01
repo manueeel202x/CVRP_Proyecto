@@ -26,11 +26,13 @@ public:
 
 private slots:
     void on_btnEjecutar_clicked(); // Slot conectado al botón de acción
+    void on_btnImportar_clicked();
 
 private:
     Ui::MainWindow *ui;
     // La instancia del problema compartido para evaluar ambos algoritmos sobre los mismos datos
     Problem *current_problem = nullptr;
+    QString rutaArchivoImportado = "";
 };
 
 #endif // MAINWINDOW_HPP

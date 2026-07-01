@@ -3,7 +3,7 @@
 #include "greedy.hpp"
 #include "brute_force.hpp"
 #include "local_search_intra.hpp"
-
+#include <QFileDialog>
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
@@ -11,11 +11,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->tablaResultados->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     // Obliga a las filas a hacer lo mismo verticalmente
     ui->tablaResultados->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->btnEjecutar->setStyleSheet("background-color: #2e7d32; color: white;");
 
-    // Configuración inicial de los selectores de algoritmos
-    //QStringList algoritmos = {"Algoritmo Greedy (Vecino Cercano)", "Fuerza Bruta (Exacto)"};
-    //ui->comboAlgoritmo1->addItems(algoritmos);
-    //ui->comboAlgoritmo2->addItems(algoritmos);
+
 }
 
 MainWindow::~MainWindow() {
@@ -24,16 +22,26 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::on_btnEjecutar_clicked() {
-    int escala = 6;       // Antes multiplicábamos por 4, subir a 6 expande el grafo por el lienzo
-    int radioNodo = 16;    // Un radio de 16 significa círculos de 32x32 píxeles (¡mucho más grandes!)
-    // 1. Capturar parámetros ingresados por el usuario en el panel izquierdo
-    int clientes = ui->spinClientes->value();
-    int vehiculos = ui->spinVehiculos->value();
-    int capacidad = ui->spinCapacidad->value();
+    int escala = 6;
+    int radioNodo = 16;
 
     // Generar una única instancia para garantizar consistencia comparativa
     if (current_problem) delete current_problem;
-    current_problem = new Problem(clientes, 4, vehiculos, capacidad, 100);
+
+    if (!rutaArchivoImportado.isEmpty()) {
+        current_problem = new Problem(100, rutaArchivoImportado.toStdString());
+        //mostrar los valores leidos del .txt
+        ui->spinClientes->setValue(current_problem->noc_);
+        ui->spinVehiculos->setValue(current_problem->nov_);
+        ui->spinCapacidad->setValue(current_problem->capacity_);
+    } else {
+        // Capturar parámetros ingresados por el usuario en el panel izquierdo
+        int clientes = ui->spinClientes->value();
+        int vehiculos = ui->spinVehiculos->value();
+        int capacidad = ui->spinCapacidad->value();
+        // Usar el constructor aleatorio de siempre
+        current_problem = new Problem(clientes, 4, vehiculos, capacidad, 100);
+    }
 
     // 2. Evaluar Algoritmo 1 según selección
     VrpSolution solucion1;
@@ -62,11 +70,13 @@ void MainWindow::on_btnEjecutar_clicked() {
     }
 
 
-    //limpiar
+    // =================================================================
+    // MOTOR DE DIBUJO USANDO QGraphicsScene (Lienzo Algoritmo 1)
+    // =================================================================
     if (ui->lienzoAlgoritmo1->scene()) {
         delete ui->lienzoAlgoritmo1->scene();
     }
-    // 4. Enviar soluciones a los paneles de visualización del centro
+    // Enviar soluciones a los paneles de visualización del centro
     QGraphicsScene *scene1 = new QGraphicsScene(this);
     ui->lienzoAlgoritmo1->setScene(scene1);
 
@@ -74,7 +84,7 @@ void MainWindow::on_btnEjecutar_clicked() {
     int depotY = current_problem->depot_.y_ * escala;
     scene1->addRect(depotX - 8, depotY - 8, 16, 16, QPen(Qt::red), QBrush(Qt::red));
 
-    // 2. Dibujar las Rutas primero (para que queden por debajo de los círculos)
+    // Dibujar las Rutas primero (para que queden por debajo de los círculos)
     Qt::GlobalColor colores[] = {Qt::green, Qt::blue, Qt::cyan, Qt::magenta, Qt::yellow, Qt::darkYellow, Qt::darkCyan};
     for (const auto& v : solucion1.vehicles_) {
         if (v.nodes_.size() < 2) continue;
@@ -120,7 +130,7 @@ void MainWindow::on_btnEjecutar_clicked() {
         }
     }
     // =================================================================
-    // MOTOR DE DIBUJO USANDO QGraphicsScene (Lienzo Inferior - Algoritmo 2)
+    // MOTOR DE DIBUJO USANDO QGraphicsScene (Lienzo Algoritmo 2)
     // =================================================================
     if (ui->lienzoAlgoritmo2->scene()) {
         delete ui->lienzoAlgoritmo2->scene();
@@ -171,6 +181,7 @@ void MainWindow::on_btnEjecutar_clicked() {
             textoDemanda->setPos(posX - (textWidth / 2), posY - (textHeight / 2));
         }
     }
+    // Celda (0, 0): Distancia del Algoritmo 1
     ui->tablaResultados->setItem(0, 0, new QTableWidgetItem(QString::number(solucion1.total_cost_, 'f', 2)));
     // Celda (1, 0): Tiempo del Algoritmo 1
     ui->tablaResultados->setItem(1, 0, new QTableWidgetItem(QString::number(solucion1.execution_time_ms_, 'f', 3)));
@@ -182,4 +193,20 @@ void MainWindow::on_btnEjecutar_clicked() {
 
     //ui->lienzoAlgoritmo1->scale(1.2, 1.2); // Hace un zoom dinámico del 150%
     //ui->lienzoAlgoritmo2->scale(1.2, 1.2);
+
+    rutaArchivoImportado = "";
+    ui->btnImportar->setText("Importar Datos (.txt)");
+    ui->btnImportar->setStyleSheet(""); // Restaura estilo original
+}
+
+void MainWindow::on_btnImportar_clicked() {
+    QString ruta = QFileDialog::getOpenFileName(this,
+                                                tr("Seleccionar archivo de clientes"), "", tr("Archivos de texto (*.txt)"));
+
+    if (!ruta.isEmpty()) {
+        rutaArchivoImportado = ruta;
+        // Opcional: Cambiar el texto del botón para mostrar que ya se cargó un archivo
+        ui->btnImportar->setText("Archivo Cargado");
+        ui->btnImportar->setStyleSheet("background-color: #2e7d32; color: white;"); // Verde éxito
+    }
 }

@@ -10,7 +10,10 @@ private:
     std::vector<Vehicle> best_vehicles_;
 
     // Función recursiva para permutar y evaluar todas las combinaciones válidas
-    void permute_and_solve(std::vector<int>& current_permutation, int index);
+    //void permute_and_solve(std::vector<int>& current_permutation, int index);
+
+    //Nota: permute_and_solve al parecer no se usa en el código, la ia lo generó pero
+    //no lo utiliza
     void evaluate_permutation(const std::vector<int>& permutation);
 
 public:

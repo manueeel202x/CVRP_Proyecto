@@ -2,7 +2,7 @@
 #include <chrono>
 #include <numeric>
 #include <iostream>
-
+#include <algorithm>
 BruteForceSolution::BruteForceSolution(const Problem& p) : problem_instance_(p) {
     best_cost_ = 1e9; // Inicializamos con un costo infinito
 }
@@ -24,6 +24,7 @@ void BruteForceSolution::evaluate_permutation(const std::vector<int>& permutatio
             vehicle_index++;
         }
 
+
         // Si nos quedamos sin vehículos y aún hay clientes en la permutación, esta ruta no es válida
         if (vehicle_index >= num_vehicles) {
             return;
@@ -34,6 +35,29 @@ void BruteForceSolution::evaluate_permutation(const std::vector<int>& permutatio
         v.cost_ += problem_instance_.distanceMatrix_[v.nodes_.back()][client.id_];
         v.load_ -= client.demand_;
         v.nodes_.push_back(client.id_);
+
+        //mi version
+        /*
+        while(vehicle_index < num_vehicles){
+            if(client.demand_ > current_vehicles[vehicle_index].load_){
+                int last_node = current_vehicles[vehicle_index].nodes_.back();
+                current_vehicles[vehicle_index].cost_ += problem_instance_.distanceMatrix_[last_node][problem_instance_.depot_.id_];
+                current_vehicles[vehicle_index].nodes_.push_back(problem_instance_.depot_.id_);
+                vehicle_index++;
+            }
+            else{
+                Vehicle& v = current_vehicles[vehicle_index];
+                v.cost_ += problem_instance_.distanceMatrix_[v.nodes_.back()][client.id_];
+                v.load_ -= client.demand_;
+                v.nodes_.push_back(client.id_);
+                break;
+            }
+        }
+
+        if (vehicle_index >= num_vehicles) {
+            return;
+        }
+        */
     }
 
     // Cerramos las rutas de los vehículos que salieron regresándolos al depósito

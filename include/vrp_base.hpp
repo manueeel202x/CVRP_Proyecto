@@ -2,13 +2,14 @@
 #define VRP_BASE_HPP
 
 #define DISPLAY_SOLUTION 1
-
 #include <vector>
 #include <string>
 #include <cmath>
+#include <cstdlib>
+#include <ctime>
+#include <iostream>
+#include <fstream>
 #include <algorithm>
-#include <cstdlib> // <--- CRUCIAL para rand()
-#include <ctime>   // <--- Para la semilla del tiempo
 
 // Estructura para representar a cada Cliente
 struct Node {
@@ -28,22 +29,21 @@ struct Vehicle {
     std::vector<int> nodes_;
 };
 
-// Clase que representa la instancia global del problema
 class Problem {
 public:
-    int noc_;                     // Cambiado # por //
-    int nov_;                     // Cambiado # por //
-    int capacity_;                // Cambiado # por //
-    Node depot_;                  // Cambiado # por //
-    std::vector<Node> nodes_;     // Cambiado # por //
+    int noc_;
+    int nov_;
+    int capacity_;
+    Node depot_;
+    std::vector<Node> nodes_;
     std::vector<Vehicle> vehicles_;
     std::vector<std::vector<double>> distanceMatrix_;
 
+    // CONSTRUCTOR 1
     Problem(int noc, int demand_range, int nov, int capacity, int grid_range) {
         noc_ = noc;
         nov_ = nov;
         capacity_ = capacity;
-
         depot_ = {0, grid_range / 2, grid_range / 2, 0, true};
 
         for (int i = 1; i <= noc_; ++i) {
@@ -56,6 +56,49 @@ public:
             nodes_.push_back(n);
         }
 
+        inicializar_vehiculos_y_distancias();
+    }
+
+    // CONSTRUCTOR 2: IMPORTAR DESDE TXT
+    Problem(int grid_range, const std::string& ruta_txt) {
+        /*
+        noc_ = noc;
+        nov_ = nov;
+        capacity_ = capacity;
+        */
+        depot_ = {0, grid_range / 2, grid_range / 2, 0, true}; // Mantiene el depósito al centro
+
+        std::ifstream archivo(ruta_txt);
+        if (!archivo.is_open()) {
+            std::cerr << "Error crítico: No se pudo abrir el archivo de datos." << std::endl;
+            return;
+        }
+
+        //leemos numero de clientes, numero de vehiculos y capacidad
+        archivo >> noc_ >> nov_ >> capacity_;
+
+        // Leer fila por fila
+        for (int i = 1; i <= noc_; ++i) {
+            Node n;
+            n.id_ = i;
+
+            if (archivo >> n.x_ >> n.y_ >> n.demand_) {
+                n.is_routed_ = false;
+                nodes_.push_back(n);
+            } else {
+                std::cerr << "Advertencia: El archivo finalizó antes de leer los " << noc_ << " clientes." << std::endl;
+                noc_ = i - 1; // Reajusta el número real de clientes leídos
+                break;
+            }
+        }
+        archivo.close();
+
+        inicializar_vehiculos_y_distancias();
+    }
+
+private:
+    // Función auxiliar para no duplicar código de inicialización
+    void inicializar_vehiculos_y_distancias() {
         for (int i = 0; i < nov_; ++i) {
             Vehicle v;
             v.id_ = i;
@@ -76,7 +119,7 @@ public:
             for (int j = 0; j < total_nodes; ++j) {
                 double dx = all_nodes[i].x_ - all_nodes[j].x_;
                 double dy = all_nodes[i].y_ - all_nodes[j].y_;
-                distanceMatrix_[i][all_nodes[j].id_] = std::sqrt(dx*dx + dy*dy);
+                distanceMatrix_[i][all_nodes[j].id_] = std::sqrt(dx * dx + dy * dy);
             }
         }
     }
