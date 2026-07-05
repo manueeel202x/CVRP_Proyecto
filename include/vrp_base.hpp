@@ -39,10 +39,10 @@ public:
     std::vector<Vehicle> vehicles_;
     std::vector<std::vector<double>> distanceMatrix_;
 
-    // CONSTRUCTOR 1
+    // CONSTRUCTOR 1: datos aleatorios
     Problem(int noc, int demand_range, int nov, int capacity, int grid_range) {
-        noc_ = noc;
-        nov_ = nov;
+        noc_ = noc; //noc : number of clientes  - numero de clientes
+        nov_ = nov; //nov : number of vehicles
         capacity_ = capacity;
         depot_ = {0, grid_range / 2, grid_range / 2, 0, true};
 
@@ -51,7 +51,7 @@ public:
             n.id_ = i;
             n.x_ = rand() % grid_range;
             n.y_ = rand() % grid_range;
-            n.demand_ = 1 + (rand() % demand_range);
+            n.demand_ = 1 + (rand() % demand_range); //demanda del cliente
             n.is_routed_ = false;
             nodes_.push_back(n);
         }

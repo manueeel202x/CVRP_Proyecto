@@ -10,35 +10,13 @@ BruteForceSolution::BruteForceSolution(const Problem& p) : problem_instance_(p) 
 void BruteForceSolution::evaluate_permutation(const std::vector<int>& permutation) {
     std::vector<Vehicle> current_vehicles = problem_instance_.vehicles_;
     int vehicle_index = 0;
-    int num_vehicles = current_vehicles.size();
+    int num_vehicles = current_vehicles.size(); //problem_instace_.nov_
 
     // Intentamos asignar los clientes de la permutación actual a los vehículos
     for (int client_id : permutation) {
         const Node& client = problem_instance_.nodes_[client_id - 1]; // id_ empieza en 1
 
-        // Si el cliente actual no cabe en el camión, este debe regresar al depósito y pasamos al siguiente
-        while (vehicle_index < num_vehicles && current_vehicles[vehicle_index].load_ - client.demand_ < 0) {
-            int last_node = current_vehicles[vehicle_index].nodes_.back();
-            current_vehicles[vehicle_index].cost_ += problem_instance_.distanceMatrix_[last_node][problem_instance_.depot_.id_];
-            current_vehicles[vehicle_index].nodes_.push_back(problem_instance_.depot_.id_);
-            vehicle_index++;
-        }
-
-
-        // Si nos quedamos sin vehículos y aún hay clientes en la permutación, esta ruta no es válida
-        if (vehicle_index >= num_vehicles) {
-            return;
-        }
-
-        // Asignamos el cliente al vehículo actual
-        Vehicle& v = current_vehicles[vehicle_index];
-        v.cost_ += problem_instance_.distanceMatrix_[v.nodes_.back()][client.id_];
-        v.load_ -= client.demand_;
-        v.nodes_.push_back(client.id_);
-
-        //mi version
-        /*
-        while(vehicle_index < num_vehicles){
+        while(vehicle_index < num_vehicles){ //sirve para mantener el analisis sobre el vehiculo actual
             if(client.demand_ > current_vehicles[vehicle_index].load_){
                 int last_node = current_vehicles[vehicle_index].nodes_.back();
                 current_vehicles[vehicle_index].cost_ += problem_instance_.distanceMatrix_[last_node][problem_instance_.depot_.id_];
@@ -57,17 +35,13 @@ void BruteForceSolution::evaluate_permutation(const std::vector<int>& permutatio
         if (vehicle_index >= num_vehicles) {
             return;
         }
-        */
+
     }
 
-    // Cerramos las rutas de los vehículos que salieron regresándolos al depósito
-    for (int i = 0; i <= vehicle_index; ++i) {
-        if (i < num_vehicles && current_vehicles[i].nodes_.back() != problem_instance_.depot_.id_) {
-            int last_node = current_vehicles[i].nodes_.back();
-            current_vehicles[i].cost_ += problem_instance_.distanceMatrix_[last_node][problem_instance_.depot_.id_];
-            current_vehicles[i].nodes_.push_back(problem_instance_.depot_.id_);
-        }
-    }
+    //esto es para cerrar la ruta del ultimo vehiculo utilizado
+    int last_node = current_vehicles[vehicle_index].nodes_.back();
+    current_vehicles[vehicle_index].cost_ += problem_instance_.distanceMatrix_[last_node][problem_instance_.depot_.id_];
+    current_vehicles[vehicle_index].nodes_.push_back(problem_instance_.depot_.id_);
 
     // Calcular el costo total de esta configuración
     double current_total_cost = 0.0;
@@ -101,7 +75,7 @@ VrpSolution BruteForceSolution::Solve() {
     auto end_time = std::chrono::high_resolution_clock::now();
     double elapsed_time = std::chrono::duration<double, std::milli>(end_time - start_time).count();
 
-    VrpSolution sol;
+    VrpSolution sol; //sol : solution
     sol.vehicles_ = best_vehicles_;
     sol.total_cost_ = best_cost_;
     sol.execution_time_ms_ = elapsed_time;

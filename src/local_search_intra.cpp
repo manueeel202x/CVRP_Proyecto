@@ -13,12 +13,17 @@ VrpSolution LocalSearchIntraSolution::Solve() {
 
     // 2. Local Search (Intra-vehículo usando 2-opt)
     for (auto& v : solucion.vehicles_) {
-        if (v.nodes_.size() < 4) continue; // No se puede optimizar si son muy pocos nodos
+        if (v.nodes_.size() < 4) continue;
 
         bool mejora = true;
         while (mejora) {
             mejora = false;
-            // Evaluamos pares de conexiones internas (excluyendo el depósito en los extremos si es fijo)
+
+            double max_ahorro = 0.0;
+            size_t mejor_i = 0;
+            size_t mejor_j = 0;
+
+            // Escaneamos TODO el vecindario de la ruta buscando el mejor movimiento posible
             for (size_t i = 1; i < v.nodes_.size() - 2; ++i) {
                 for (size_t j = i + 1; j < v.nodes_.size() - 1; ++j) {
 
@@ -27,20 +32,28 @@ VrpSolution LocalSearchIntraSolution::Solve() {
                     int n_j = v.nodes_[j];
                     int n_next_j = v.nodes_[j+1];
 
-                    // Distancia actual de las aristas
                     double dist_actual = problem_.distanceMatrix_[n_i][n_next_i] +
                                          problem_.distanceMatrix_[n_j][n_next_j];
 
-                    // Distancia si invertimos el segmento
                     double dist_nueva = problem_.distanceMatrix_[n_i][n_j] +
                                         problem_.distanceMatrix_[n_next_i][n_next_j];
 
-                    // Si la nueva distancia es menor, reconectamos la ruta (2-opt swap)
-                    if (dist_nueva < dist_actual) {
-                        std::reverse(v.nodes_.begin() + i + 1, v.nodes_.begin() + j + 1);
-                        mejora = true;
+                    // Calculamos el ahorro neto de esta opción
+                    double ahorro_actual = dist_actual - dist_nueva;
+
+                    // Si este cambio es mejor que el anterior máximo guardado, lo recordamos
+                    if (ahorro_actual > max_ahorro) {
+                        max_ahorro = ahorro_actual;
+                        mejor_i = i;
+                        mejor_j = j;
                     }
                 }
+            }
+
+            // Al salir de los bucles 'for', RECIÉN aplicamos el ÚNICO movimiento que más ahorró
+            if (max_ahorro > 0.0) {
+                std::reverse(v.nodes_.begin() + mejor_i + 1, v.nodes_.begin() + mejor_j + 1);
+                mejora = true; // Forzamos otra pasada del while para verificar si quedan más mejoras
             }
         }
 

@@ -39,8 +39,8 @@ void MainWindow::on_btnEjecutar_clicked() {
         int clientes = ui->spinClientes->value();
         int vehiculos = ui->spinVehiculos->value();
         int capacidad = ui->spinCapacidad->value();
-        // Usar el constructor aleatorio de siempre
-        current_problem = new Problem(clientes, 4, vehiculos, capacidad, 100);
+        // Usar el constructor aleatorio
+        current_problem = new Problem(clientes, 10, vehiculos, capacidad, 100);
     }
 
     // 2. Evaluar Algoritmo 1 según selección
