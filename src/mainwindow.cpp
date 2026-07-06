@@ -4,6 +4,10 @@
 #include "brute_force.hpp"
 #include "local_search_intra.hpp"
 #include <QFileDialog>
+#include <QTextStream>
+#include <QTimer>
+#include <QFile>
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
@@ -12,8 +16,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // Obliga a las filas a hacer lo mismo verticalmente
     ui->tablaResultados->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->btnEjecutar->setStyleSheet("background-color: #2e7d32; color: white;");
-
-
+    connect(ui->btnExportar, &QPushButton::clicked, this, &MainWindow::on_btnExportar_clicked);
 }
 
 MainWindow::~MainWindow() {
@@ -25,23 +28,63 @@ void MainWindow::on_btnEjecutar_clicked() {
     int escala = 6;
     int radioNodo = 16;
 
-    // Generar una única instancia para garantizar consistencia comparativa
+    // Guardamos la capacidad que el usuario ha digitado libremente en la pantalla
+    int capacidadUsuario = ui->spinCapacidad->value();
+
     if (current_problem) delete current_problem;
 
     if (!rutaArchivoImportado.isEmpty()) {
         current_problem = new Problem(100, rutaArchivoImportado.toStdString());
-        //mostrar los valores leidos del .txt
+
+        // Sincronizamos clientes y vehículos del archivo
         ui->spinClientes->setValue(current_problem->noc_);
         ui->spinVehiculos->setValue(current_problem->nov_);
-        ui->spinCapacidad->setValue(current_problem->capacity_);
+
+        // Si el usuario especificó una capacidad válida en la pantalla, la usamos, si es 0 usamos la del archivo
+        if (capacidadUsuario > 0) {
+            current_problem->capacity_ = capacidadUsuario;
+        } else {
+            ui->spinCapacidad->setValue(current_problem->capacity_);
+        }
     } else {
-        // Capturar parámetros ingresados por el usuario en el panel izquierdo
         int clientes = ui->spinClientes->value();
         int vehiculos = ui->spinVehiculos->value();
-        int capacidad = ui->spinCapacidad->value();
-        // Usar el constructor aleatorio
-        current_problem = new Problem(clientes, 10, vehiculos, capacidad, 100);
+
+        if (clientes <= 0) { clientes = 10; ui->spinClientes->setValue(10); }
+        if (vehiculos <= 0) { vehiculos = 3; ui->spinVehiculos->setValue(3); }
+        if (capacidadUsuario <= 0) { capacidadUsuario = 50; ui->spinCapacidad->setValue(50); }
+
+        // Usar el constructor aleatorio seguro de manera 100% libre
+        current_problem = new Problem(clientes, 10, vehiculos, capacidadUsuario, 100);
     }
+
+
+
+
+    // =================================================================
+    // ─── NUEVO BLOQUE: CÁLCULO DE DEMANDA VS CAPACIDAD TOTAL ───
+    // =================================================================
+    int demandaTotal = 0;
+    for (const auto& node : current_problem->nodes_) {
+        demandaTotal += node.demand_; // Sumamos el pedido de cada cliente
+    }
+
+    // Capacidad de la flota = Número de camiones × Capacidad de cada uno
+    int capacidadTotalFlota = current_problem->nov_ * current_problem->capacity_;
+
+    // Imprimimos los resultados directamente en los nuevos labels de la UI
+    ui->lblDemandaTotal->setText(QString::number(demandaTotal));
+    ui->lblCapacidadFlota->setText(QString::number(capacidadTotalFlota));
+
+    // Opcional: Alerta visual en color rojo si la demanda supera la capacidad de la flota
+    if (demandaTotal > capacidadTotalFlota) {
+        ui->lblDemandaTotal->setStyleSheet("color: #d32f2f; font-weight: bold;"); // Rojo advertencia
+        ui->lblCapacidadFlota->setStyleSheet("color: #d32f2f; font-weight: bold;");
+    } else {
+        ui->lblDemandaTotal->setStyleSheet("color: white; font-weight: bold;"); // Color normal (o el que use tu tema)
+        ui->lblCapacidadFlota->setStyleSheet("color: white; font-weight: bold;");
+    }
+
 
     // 2. Evaluar Algoritmo 1 según selección
     VrpSolution solucion1;
@@ -69,14 +112,12 @@ void MainWindow::on_btnEjecutar_clicked() {
         solucion2 = solver.Solve();
     }
 
-
     // =================================================================
     // MOTOR DE DIBUJO USANDO QGraphicsScene (Lienzo Algoritmo 1)
     // =================================================================
     if (ui->lienzoAlgoritmo1->scene()) {
         delete ui->lienzoAlgoritmo1->scene();
     }
-    // Enviar soluciones a los paneles de visualización del centro
     QGraphicsScene *scene1 = new QGraphicsScene(this);
     ui->lienzoAlgoritmo1->setScene(scene1);
 
@@ -84,12 +125,11 @@ void MainWindow::on_btnEjecutar_clicked() {
     int depotY = current_problem->depot_.y_ * escala;
     scene1->addRect(depotX - 8, depotY - 8, 16, 16, QPen(Qt::red), QBrush(Qt::red));
 
-    // Dibujar las Rutas primero (para que queden por debajo de los círculos)
     Qt::GlobalColor colores[] = {Qt::green, Qt::blue, Qt::cyan, Qt::magenta, Qt::yellow, Qt::darkYellow, Qt::darkCyan};
     for (const auto& v : solucion1.vehicles_) {
         if (v.nodes_.size() < 2) continue;
         QPen pen(colores[v.id_ % 7]);
-        pen.setWidth(3); // Grosor equilibrado
+        pen.setWidth(3);
 
         for (size_t i = 0; i < v.nodes_.size() - 1; ++i) {
             int from_id = v.nodes_[i];
@@ -98,37 +138,33 @@ void MainWindow::on_btnEjecutar_clicked() {
             Node from_node = (from_id == 0) ? current_problem->depot_ : current_problem->nodes_[from_id - 1];
             Node to_node = (to_id == 0) ? current_problem->depot_ : current_problem->nodes_[to_id - 1];
 
-            // Conectamos exactamente los centros geométricos
             scene1->addLine(from_node.x_ * escala, from_node.y_ * escala,
                             to_node.x_ * escala, to_node.y_ * escala, pen);
         }
     }
 
-    // 3. Dibujar los Nodos Clientes arriba de las líneas
     for (const auto& node : current_problem->nodes_) {
         int posX = node.x_ * escala;
         int posY = node.y_ * escala;
 
-        // Círculo del cliente
         scene1->addEllipse(posX - radioNodo, posY - radioNodo, radioNodo * 2, radioNodo * 2,
                            QPen(Qt::white, 2), QBrush(Qt::blue));
 
-        // Texto de la demanda al frente de todo
         if (ui->chkMostrarDemandas->isChecked()) {
             QGraphicsTextItem *textoDemanda = scene1->addText(QString::number(node.demand_));
             textoDemanda->setDefaultTextColor(Qt::white);
 
             QFont font = textoDemanda->font();
-            font.setPointSize(11); // Letra grande y legible
+            font.setPointSize(11);
             font.setBold(true);
             textoDemanda->setFont(font);
 
-            // Centrado matemático perfecto dentro del círculo azul
             double textWidth = textoDemanda->boundingRect().width();
             double textHeight = textoDemanda->boundingRect().height();
             textoDemanda->setPos(posX - (textWidth / 2), posY - (textHeight / 2));
         }
     }
+
     // =================================================================
     // MOTOR DE DIBUJO USANDO QGraphicsScene (Lienzo Algoritmo 2)
     // =================================================================
@@ -138,10 +174,8 @@ void MainWindow::on_btnEjecutar_clicked() {
     QGraphicsScene *scene2 = new QGraphicsScene(this);
     ui->lienzoAlgoritmo2->setScene(scene2);
 
-    // 1. Centro real del depósito en Escena 2
     scene2->addRect(depotX - 8, depotY - 8, 16, 16, QPen(Qt::red), QBrush(Qt::red));
 
-    // 2. Dibujar las Rutas de la solución 2
     for (const auto& v : solucion2.vehicles_) {
         if (v.nodes_.size() < 2) continue;
         QPen pen(colores[v.id_ % 7]);
@@ -159,7 +193,6 @@ void MainWindow::on_btnEjecutar_clicked() {
         }
     }
 
-    // 3. Dibujar los Nodos Clientes en Escena 2
     for (const auto& node : current_problem->nodes_) {
         int posX = node.x_ * escala;
         int posY = node.y_ * escala;
@@ -181,22 +214,15 @@ void MainWindow::on_btnEjecutar_clicked() {
             textoDemanda->setPos(posX - (textWidth / 2), posY - (textHeight / 2));
         }
     }
-    // Celda (0, 0): Distancia del Algoritmo 1
+
     ui->tablaResultados->setItem(0, 0, new QTableWidgetItem(QString::number(solucion1.total_cost_, 'f', 2)));
-    // Celda (1, 0): Tiempo del Algoritmo 1
     ui->tablaResultados->setItem(1, 0, new QTableWidgetItem(QString::number(solucion1.execution_time_ms_, 'f', 3)));
-
-    // Celda (0, 1): Distancia del Algoritmo 2
     ui->tablaResultados->setItem(0, 1, new QTableWidgetItem(QString::number(solucion2.total_cost_, 'f', 2)));
-    // Celda (1, 1): Tiempo del Algoritmo 2
     ui->tablaResultados->setItem(1, 1, new QTableWidgetItem(QString::number(solucion2.execution_time_ms_, 'f', 3)));
-
-    //ui->lienzoAlgoritmo1->scale(1.2, 1.2); // Hace un zoom dinámico del 150%
-    //ui->lienzoAlgoritmo2->scale(1.2, 1.2);
 
     rutaArchivoImportado = "";
     ui->btnImportar->setText("Importar Datos (.txt)");
-    ui->btnImportar->setStyleSheet(""); // Restaura estilo original
+    ui->btnImportar->setStyleSheet("");
 }
 
 void MainWindow::on_btnImportar_clicked() {
@@ -205,8 +231,50 @@ void MainWindow::on_btnImportar_clicked() {
 
     if (!ruta.isEmpty()) {
         rutaArchivoImportado = ruta;
-        // Opcional: Cambiar el texto del botón para mostrar que ya se cargó un archivo
         ui->btnImportar->setText("Archivo Cargado");
-        ui->btnImportar->setStyleSheet("background-color: #2e7d32; color: white;"); // Verde éxito
+        ui->btnImportar->setStyleSheet("background-color: #2e7d32; color: white;");
+    }
+}
+
+void MainWindow::on_btnExportar_clicked() {
+    // Si no se ha generado o importado ningún problema, no hay nada que exportar
+    if (!current_problem) {
+        return;
+    }
+
+    // Abre el diálogo nativo del sistema operativo para guardar el archivo
+    QString rutaGuardar = QFileDialog::getSaveFileName(this,
+                                                       tr("Exportar Instancia Actual"),
+                                                       "",
+                                                       tr("Archivos de texto (*.txt)"));
+
+    if (rutaGuardar.isEmpty()) {
+        return; // El usuario canceló la ventana de guardado
+    }
+
+    QFile archivo(rutaGuardar);
+    if (archivo.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&archivo);
+
+        // 1. Primera fila: Número de clientes, número de vehículos y capacidad
+        out << current_problem->noc_ << " "
+            << current_problem->nov_ << " "
+            << current_problem->capacity_ << "\n";
+
+        // 2. Siguientes filas: Solo las coordenadas X, Y y la Demanda de cada cliente
+        // Se omite por completo el ID y los datos del depósito
+        for (const auto& node : current_problem->nodes_) {
+            out << node.x_ << " "
+                << node.y_ << " "
+                << node.demand_ << "\n";
+        }
+
+        archivo.close();
+
+        // Animación temporal para confirmar el éxito en la interfaz
+        ui->btnExportar->setText("¡Instancia Guardada!");
+        QTimer::singleShot(2000, this, [this]() {
+            ui->btnExportar->setText("Exportar Instancia (.txt)");
+        });
     }
 }

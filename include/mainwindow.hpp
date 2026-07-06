@@ -33,6 +33,7 @@ private:
     // La instancia del problema compartido para evaluar ambos algoritmos sobre los mismos datos
     Problem *current_problem = nullptr;
     QString rutaArchivoImportado = "";
+    void on_btnExportar_clicked();
 };
 
 #endif // MAINWINDOW_HPP
